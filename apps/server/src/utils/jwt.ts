@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { env } from '~/config/env';
+import { env } from '~/lib/env';
 
 export class JWT {
   static decode(token: string) {

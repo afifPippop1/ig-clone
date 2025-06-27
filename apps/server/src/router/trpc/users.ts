@@ -1,4 +1,4 @@
-import { authenticatedProcedure, router } from '~/config/trpc';
+import { authenticatedProcedure, router } from '~/lib/trpc';
 
 export const usersRouter = router({
   list: authenticatedProcedure.query(() => {

@@ -1,6 +1,6 @@
-import { prisma } from '@ig-clone/database';
+import { Prisma, prisma } from '@ig-clone/database';
 import { z } from 'zod';
-import { publicProcedure, router } from '~/config/trpc';
+import { publicProcedure, router } from '~/lib/trpc';
 import { JWT } from '~/utils/jwt';
 import bcrypt from 'bcrypt';
 import { TRPCServerError } from '~/utils/error';
@@ -40,7 +40,13 @@ export const authRouter = router({
         });
         const token = JWT.encode({ id: user.id });
         return { token };
-      } catch {
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          throw TRPCServerError.conflict('Email already exists');
+        }
         throw TRPCServerError.internalError('Internal Server Error');
       }
     }),

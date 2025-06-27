@@ -2,7 +2,7 @@ import {
   CreateExpressContextOptions,
   createExpressMiddleware,
 } from '@trpc/server/adapters/express';
-import { Context } from '~/config/trpc';
+import { Context } from '~/lib/trpc';
 import { trpcRouter } from '~/router/trpc';
 import { JWT } from '~/utils/jwt';
 
