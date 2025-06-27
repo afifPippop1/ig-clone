@@ -1,7 +1,20 @@
 {
-  "name": "instagram",
+  "name": "ig-clone",
   "version": "1.0.0",
   "description": "",
-  "scripts": {},
-  "packageManager": "pnpm@10.12.1"
+  "scripts": {
+    "dev": "concurrently \"pnpm run dev:server\" \"pnpm run dev:web\"",
+    "dev:server": "cd apps/server && pnpm run dev",
+    "dev:web": "cd apps/web && pnpm run dev"
+  },
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "@trpc/client": "^11.4.2",
+    "@trpc/server": "^11.4.2",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
 }
