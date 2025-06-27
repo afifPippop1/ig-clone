@@ -10,6 +10,8 @@ function createContext(opts: CreateExpressContextOptions): Context {
   const authorization = opts.req.get('authorization') || '';
   const token = JWT.decode(authorization);
 
+  console.log(`${opts.req.method} ${opts.req.url}`);
+
   if (!token) {
     return {
       req: opts.req,

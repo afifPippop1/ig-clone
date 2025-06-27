@@ -1,3 +1,7 @@
+# Ignored folder
 node_modules/
-
 dist/
+postgres-data
+
+.env.*
+.env
