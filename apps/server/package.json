@@ -1,0 +1,30 @@
+{
+  "name": "@ig-clone/server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsup src/index.ts --out-dir dist --clean",
+    "build:watch": "tsup src/index.ts --watch",
+    "dev": "tsup src/index.ts --watch --onSuccess \"nodemon dist/index.js\"",
+    "serve": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "tsup": "^8.5.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  }
+}
