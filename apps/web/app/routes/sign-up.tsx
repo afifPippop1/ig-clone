@@ -23,6 +23,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const response = await trpc.auth.signUp.mutate({
       email: result.data.email,
       password: result.data.password,
+      confirm: result.data.confirm,
     });
 
     if (response.ok) {

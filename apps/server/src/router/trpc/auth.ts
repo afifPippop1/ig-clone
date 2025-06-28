@@ -1,73 +1,51 @@
-import { Prisma, prisma } from '@ig-clone/database';
-import { z } from 'zod';
+import { Prisma } from '@ig-clone/database';
+import { signInSchema, signUpSchema } from '@ig-clone/schema';
 import { publicProcedure, router } from '~/lib/trpc';
-import { JWT } from '~/utils/jwt';
-import bcrypt from 'bcrypt';
-import { TRPCServerError } from '~/utils/error';
+import { createUser, signInService } from '~/services/auth-service';
+import { TRPCErrorCode, TRPCServerError } from '~/utils/error';
+
+const LOGIN_ERROR_MESSAGE = 'Invalid email or password';
+
+const signInMuatation = publicProcedure
+  .input(signInSchema)
+  .mutation(async ({ input }) => {
+    try {
+      const { email, password } = input;
+      const token = await signInService({ email, password });
+
+      return { token };
+    } catch (error) {
+      if (
+        error instanceof TRPCServerError &&
+        error.code === TRPCErrorCode.UNAUTHORIZED
+      ) {
+        throw TRPCServerError.unauthorized(LOGIN_ERROR_MESSAGE);
+      }
+      throw TRPCServerError.internalError();
+    }
+  });
+
+const signUpMutation = publicProcedure
+  .input(signUpSchema)
+  .mutation(async ({ input }) => {
+    try {
+      const { email, password, confirm } = input;
+
+      await createUser({ email, password, confirm });
+
+      return { ok: true, message: 'User created successfully' };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw TRPCServerError.conflict('Email already exists');
+      }
+      throw TRPCServerError.internalError();
+    }
+  });
 
 export const authRouter = router({
-  signIn: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        password: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      try {
-        const { email, password } = input;
-        const user = await prisma.user.findFirst({
-          where: {
-            email,
-          },
-        });
-
-        if (!user) {
-          throw TRPCServerError.unauthorized();
-        }
-        const confirmPassword = bcrypt.compareSync(password, user.password);
-        if (!confirmPassword) {
-          throw TRPCServerError.unauthorized();
-        }
-
-        const token = JWT.encode({ id: user.id });
-        return { token };
-      } catch (error: any) {
-        if (error instanceof TRPCServerError && error.code === 'UNAUTHORIZED') {
-          throw TRPCServerError.unauthorized('Invalid email or password');
-        }
-        throw TRPCServerError.internalError('Internal Server Error');
-      }
-    }),
-  signUp: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        password: z.string().min(6),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { email, password } = input;
-      const encryptedPassword = bcrypt.hashSync(
-        password,
-        bcrypt.genSaltSync(10)
-      );
-      try {
-        await prisma.user.create({
-          data: {
-            email,
-            password: encryptedPassword,
-          },
-        });
-        return { ok: true, message: 'User created successfully' };
-      } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === 'P2002'
-        ) {
-          throw TRPCServerError.conflict('Email already exists');
-        }
-        throw TRPCServerError.internalError('Internal Server Error');
-      }
-    }),
+  signIn: signInMuatation,
+  signUp: signUpMutation,
 });
