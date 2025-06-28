@@ -1,29 +1,36 @@
 import { signUpSchema, SignUpSchema } from '@ig-clone/schema';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { redirect, useFetcher } from '@remix-run/react';
+import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
+import { Birthdate } from '~/components/shared/birthdate';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { trpc } from '~/lib/trpc';
 
+const AlreadyExistsMessage = ' already exists';
+
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData) as Partial<SignUpSchema>;
-
-  const result = signUpSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.flatten().fieldErrors;
-    return { errors };
-  }
-
   try {
+    const formData = await request.formData();
+    const data = Object.fromEntries(formData) as Partial<SignUpSchema>;
+
+    const result = signUpSchema.safeParse(data);
+
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      return { errors };
+    }
+
+    const { email, password, birthdate, confirm, name, username } = result.data;
     const response = await trpc.auth.signUp.mutate({
-      email: result.data.email,
-      password: result.data.password,
-      confirm: result.data.confirm,
+      email,
+      password,
+      confirm,
+      birthdate,
+      name,
+      username,
     });
 
     if (response.ok) {
@@ -34,59 +41,103 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     const message =
-      error?.message || 'Something went wrong. Please try again later.';
+      (error?.message as string) ||
+      'Something went wrong. Please try again later.';
 
-    if (message === 'Email already exists') {
-      return { errors: { email: message as string[] } };
+    if (message.includes(AlreadyExistsMessage)) {
+      const [fieldsStr] = message.split(AlreadyExistsMessage);
+      const fields = fieldsStr.split(' ,');
+      const fieldsMessage = fields.reduce(
+        (acc, value) => ({
+          ...acc,
+          [value]: `${value}${AlreadyExistsMessage}`.replace(/^./, (c) =>
+            c.toUpperCase(),
+          ),
+        }),
+        {} as Record<keyof SignUpSchema, string>,
+      );
+      return { errors: fieldsMessage };
     }
     return { error: message };
   }
 };
 
 export default function SignUpPage() {
-  const fetcher = useFetcher<typeof action>();
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === 'submitting';
 
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="flex flex-col items-center gap-16">
         <header className="flex flex-col items-center gap-9">
           <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
-            Sign Up
+            Get started on Instagram
           </h1>
+          <p>Sign up to see photos and videos from your friends.</p>
         </header>
-        <Card>
+        <Card className="min-w-xl">
           <CardContent>
-            <p className="leading-6 text-gray-700 dark:text-gray-200">
-              Please sign up to continue.
-            </p>
-
-            {fetcher.data?.error && (
-              <p className="text-sm text-red-500">{fetcher.data.error}</p>
+            {actionData?.error && (
+              <p className="text-sm text-red-500">{actionData.error}</p>
             )}
-            <fetcher.Form method="post" className="space-y-8">
-              <Label>Email</Label>
-              <Input placeholder="your-email@address.com" name="email" />
-              {fetcher.data?.errors?.email && (
-                <p className="text-sm text-red-500">
-                  <span>{fetcher.data.errors.email}</span>
-                </p>
-              )}
-              <Label>Password</Label>
-              <Input name="password" type="password" placeholder="••••••••" />
-              {fetcher.data?.errors?.password && (
-                <p className="text-sm text-red-500">
-                  <span>{fetcher.data.errors.password}</span>
-                </p>
-              )}
-              <Label>Confirm Password</Label>
-              <Input type="password" placeholder="••••••••" name="confirm" />
-              {fetcher.data?.errors?.confirm && (
-                <p className="text-sm text-red-500">
-                  <span>{fetcher.data.errors.confirm}</span>
-                </p>
-              )}
-              <Button type="submit">
-                {fetcher.state === 'submitting' ? (
+            <Form method="post" className="space-y-8">
+              <div className="flex flex-col gap-2">
+                <Label>Email</Label>
+                <Input placeholder="your-email@address.com" name="email" />
+                {actionData?.errors?.email && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.email}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Password</Label>
+                <Input name="password" type="password" placeholder="••••••••" />
+                {actionData?.errors?.password && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.password}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Confirm Password</Label>
+                <Input type="password" placeholder="••••••••" name="confirm" />
+                {actionData?.errors?.confirm && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.confirm}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Birthday</Label>
+                <Birthdate />
+                {actionData?.errors?.birthdate && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.birthdate}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Fullname</Label>
+                <Input type="text" placeholder="Fullname" name="name" />
+                {actionData?.errors?.name && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.name}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Username</Label>
+                <Input type="text" placeholder="Username" name="username" />
+                {actionData?.errors?.username && (
+                  <p className="text-sm text-red-500">
+                    <span>{actionData.errors.username}</span>
+                  </p>
+                )}
+              </div>
+              <Button type="submit" className="w-full">
+                {isSubmitting ? (
                   <>
                     <Loader2Icon className="animate-spin" />
                     Signing Up...
@@ -95,7 +146,7 @@ export default function SignUpPage() {
                   'Sign Up'
                 )}
               </Button>
-            </fetcher.Form>
+            </Form>
           </CardContent>
         </Card>
       </div>

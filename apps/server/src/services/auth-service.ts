@@ -4,14 +4,27 @@ import bcrypt from 'bcrypt';
 import { TRPCServerError } from '~/utils/error';
 import { JWT } from '~/utils/jwt';
 
-export async function createUser(user: SignUpSchema) {
-  const { email, password } = user;
+export async function createUser(data: SignUpSchema) {
+  const { email, password, username, name, birthdate } = data;
   const encryptedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  return await prisma.user.create({
-    data: {
-      email,
-      password: encryptedPassword,
-    },
+  return await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        email,
+        password: encryptedPassword,
+        username,
+      },
+    });
+
+    const profile = await tx.profile.create({
+      data: {
+        id: user.id,
+        birthdate,
+        name,
+      },
+    });
+
+    return { user, profile };
   });
 }
 

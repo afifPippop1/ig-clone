@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "watch:server": "pnpm --filter @ig-clone/server build",
+    "watch:server": "pnpm --filter @ig-clone/server build:watch",
+    "watch:database": "pnpm --filter @ig-clone/database build:watch",
+    "watch:schema": "pnpm --filter @ig-clone/schema build:watch",
     "build:server": "pnpm --filter @ig-clone/server build",
     "build:database": "pnpm --filter @ig-clone/database build",
     "build:schema": "pnpm --filter @ig-clone/schema build",
-    "dev": "concurrently \"pnpm run dev:server\" \"pnpm run dev:web\"",
+    "dev": "concurrently \"pnpm watch:server\" \"pnpm watch:database\" \"pnpm watch:schema\" \"pnpm run dev:server\" \"pnpm run dev:web\"",
     "dev:server": "pnpm --filter @ig-clone/server dev",
     "dev:web": "pnpm --filter @ig-clone/web dev",
-    "db:generate": "pnpm --filter @ig-clone/database db:generate"
+    "db:generate": "pnpm --filter @ig-clone/database db:generate",
+    "db:migrate": "pnpm --filter @ig-clone/database db:migrate",
+    "db:studio": "pnpm --filter @ig-clone/database db:studio"
   },
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "dependencies": {

@@ -29,9 +29,9 @@ const signUpMutation = publicProcedure
   .input(signUpSchema)
   .mutation(async ({ input }) => {
     try {
-      const { email, password, confirm } = input;
+      const { email, password, confirm, birthdate, name, username } = input;
 
-      await createUser({ email, password, confirm });
+      await createUser({ email, password, confirm, birthdate, name, username });
 
       return { ok: true, message: 'User created successfully' };
     } catch (error) {
@@ -39,7 +39,9 @@ const signUpMutation = publicProcedure
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw TRPCServerError.conflict('Email already exists');
+        const field = (error?.meta?.target as string[]).join(', ') || 'email';
+
+        throw TRPCServerError.conflict(`${field} already exists`);
       }
       throw TRPCServerError.internalError();
     }
