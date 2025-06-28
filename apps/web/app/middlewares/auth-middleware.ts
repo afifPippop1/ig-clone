@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node';
 import { authCookie } from '~/lib/auth';
 
-const AuthRoute = new Set(['/sign-in', 'sign-up']);
+const AuthRoute = new Set(['/sign-in', '/sign-up']);
 
 export const authMiddleware = async ({ request }: LoaderFunctionArgs) => {
   const pathname = new URL(request.url).pathname;
