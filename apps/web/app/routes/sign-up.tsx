@@ -26,7 +26,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
 
     if (response.ok) {
-      return redirect('/auth/sign-in');
+      return redirect('/sign-in');
     }
 
     return { error: 'Unknown error occurred.' };

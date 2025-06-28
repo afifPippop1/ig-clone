@@ -4,7 +4,10 @@
   "description": "",
   "scripts": {
     "watch:server": "pnpm --filter @ig-clone/server build",
-    "dev": "concurrently \"pnpm run dev:server\" \"pnpm run watch:server && pnpm run dev:web\"",
+    "build:server": "pnpm --filter @ig-clone/server build",
+    "build:database": "pnpm --filter @ig-clone/database build",
+    "build:schema": "pnpm --filter @ig-clone/schema build",
+    "dev": "concurrently \"pnpm run dev:server\" \"pnpm run dev:web\"",
     "dev:server": "pnpm --filter @ig-clone/server dev",
     "dev:web": "pnpm --filter @ig-clone/web dev",
     "db:generate": "pnpm --filter @ig-clone/database db:generate"
