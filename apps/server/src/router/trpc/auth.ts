@@ -10,13 +10,34 @@ export const authRouter = router({
     .input(
       z.object({
         email: z.string().email(),
-        password: z.string().min(6),
+        password: z.string(),
       })
     )
-    .mutation(({ input }) => {
-      const { email, password } = input;
-      const token = JWT.encode({ id: '12345' });
-      return { token };
+    .mutation(async ({ input }) => {
+      try {
+        const { email, password } = input;
+        const user = await prisma.user.findFirst({
+          where: {
+            email,
+          },
+        });
+
+        if (!user) {
+          throw TRPCServerError.unauthorized();
+        }
+        const confirmPassword = bcrypt.compareSync(password, user.password);
+        if (!confirmPassword) {
+          throw TRPCServerError.unauthorized();
+        }
+
+        const token = JWT.encode({ id: user.id });
+        return { token };
+      } catch (error: any) {
+        if (error instanceof TRPCServerError && error.code === 'UNAUTHORIZED') {
+          throw TRPCServerError.unauthorized('Invalid email or password');
+        }
+        throw TRPCServerError.internalError('Internal Server Error');
+      }
     }),
   signUp: publicProcedure
     .input(
@@ -32,14 +53,13 @@ export const authRouter = router({
         bcrypt.genSaltSync(10)
       );
       try {
-        const user = await prisma.user.create({
+        await prisma.user.create({
           data: {
             email,
             password: encryptedPassword,
           },
         });
-        const token = JWT.encode({ id: user.id });
-        return { token };
+        return { ok: true, message: 'User created successfully' };
       } catch (error) {
         if (
           error instanceof Prisma.PrismaClientKnownRequestError &&

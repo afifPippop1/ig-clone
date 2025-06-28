@@ -8,9 +8,7 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { trpc } from '~/lib/trpc';
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
-  console.log('Params:', params);
-  console.log('Body:', request.body);
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData) as Partial<SignUpSchema>;
 
@@ -27,8 +25,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       password: result.data.password,
     });
 
-    if (response.token) {
-      return redirect('/');
+    if (response.ok) {
+      return redirect('/auth/sign-in');
     }
 
     return { error: 'Unknown error occurred.' };

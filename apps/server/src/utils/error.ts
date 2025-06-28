@@ -17,7 +17,7 @@ export class TRPCServerError extends TRPCError {
   static forbidden(message: string) {
     return new TRPCServerError('FORBIDDEN', message);
   }
-  static unauthorized(message: string) {
+  static unauthorized(message: string = 'Unauthorized') {
     return new TRPCServerError('UNAUTHORIZED', message);
   }
   static conflict(message: string) {
