@@ -1,7 +1,8 @@
 import { signInSchema, SignInSchema } from '@ig-clone/schema';
-import { ActionFunctionArgs, redirect } from '@remix-run/node';
-import { Form, useActionData, useNavigation } from '@remix-run/react';
+import { ActionFunctionArgs } from '@remix-run/node';
+import { data, Form, useActionData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
+import { useEffect } from 'react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
@@ -10,10 +11,10 @@ import { authCookie } from '~/lib/auth';
 import { trpc } from '~/lib/trpc';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData) as Partial<SignInSchema>;
+  const form = await request.formData();
+  const formData = Object.fromEntries(form) as Partial<SignInSchema>;
 
-  const result = signInSchema.safeParse(data);
+  const result = signInSchema.safeParse(formData);
 
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors;
@@ -27,11 +28,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
 
     if (response?.token) {
-      return redirect('/', {
-        headers: {
-          'Set-Cookie': await authCookie.serialize(response.token),
+      return data(
+        { error: null },
+        {
+          headers: {
+            'Set-Cookie': await authCookie.serialize(response.token),
+          },
         },
-      });
+      );
     }
 
     return { error: 'Unknown error occurred.' };
@@ -48,6 +52,12 @@ export default function SignInPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
+
+  useEffect(() => {
+    if (!isSubmitting && actionData?.error === null) {
+      window.location.href = '/';
+    }
+  }, [actionData?.error, isSubmitting]);
 
   return (
     <div className="flex h-screen items-center justify-center">
@@ -77,13 +87,16 @@ export default function SignInPage() {
                 className="p-2 border border-gray-300 rounded"
               />
             </div>
-            <Input
-              type="password"
-              name="password"
-              placeholder="Password"
-              required
-              className="p-2 border border-gray-300 rounded"
-            />
+            <div className="flex flex-col gap-2">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
             <Button type="submit">
               {isSubmitting ? (
                 <>

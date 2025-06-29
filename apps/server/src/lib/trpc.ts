@@ -1,9 +1,10 @@
 import { initTRPC } from '@trpc/server';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { TRPCServerError } from '~/utils/error';
 
 export interface Context {
   req: Request;
+  res: Response;
   user?: {
     id: string;
   };
@@ -16,7 +17,7 @@ export const publicProcedure = t.procedure;
 export const authenticatedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) {
     throw TRPCServerError.unauthorized(
-      'You must be logged in to access this resource.'
+      'You are unauthorized to access this resource.'
     );
   }
   return next({

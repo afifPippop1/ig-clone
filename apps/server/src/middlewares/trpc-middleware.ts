@@ -6,23 +6,26 @@ import { Context } from '~/lib/trpc';
 import { trpcRouter } from '~/router/trpc';
 import { JWT } from '~/utils/jwt';
 
-function createContext(opts: CreateExpressContextOptions): Context {
-  const authorization = opts.req.get('authorization') || '';
-  const token = JWT.decode(authorization);
+function createContext({ req, res }: CreateExpressContextOptions): Context {
+  const authorization = req.headers.authorization;
+  console.log(`${req.method} ${req.url}`);
 
-  console.log(`${opts.req.method} ${opts.req.url}`);
+  if (authorization) {
+    const token = JWT.decode(authorization) as { id: string };
 
-  if (!token) {
-    return {
-      req: opts.req,
-    };
+    if (token.id) {
+      return {
+        req,
+        res,
+        user: {
+          id: token.id,
+        },
+      };
+    }
   }
-
   return {
-    req: opts.req,
-    user: {
-      id: token as string,
-    },
+    req,
+    res,
   };
 }
 

@@ -1,17 +1,28 @@
 import { Prisma } from '@ig-clone/database';
-import { signInSchema, signUpSchema } from '@ig-clone/schema';
-import { publicProcedure, router } from '~/lib/trpc';
+import { signInSchema, signUpSchema, userSchema } from '@ig-clone/schema';
+import { authenticatedProcedure, publicProcedure, router } from '~/lib/trpc';
 import { createUser, signInService } from '~/services/auth-service';
+import { getUserById } from '~/services/user-service';
 import { TRPCErrorCode, TRPCServerError } from '~/utils/error';
 
 const LOGIN_ERROR_MESSAGE = 'Invalid email or password';
 
+const COOKIE_NAME = 'auth';
+
+function createAuthCookie(token: string) {
+  return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Max-Age=${
+    60 * 60 * 24 * 30
+  }; SameSite=Lax; ${process.env.NODE_ENV === 'production' ? 'Secure' : ''}`;
+}
+
 const signInMuatation = publicProcedure
   .input(signInSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     try {
       const { email, password } = input;
       const token = await signInService({ email, password });
+
+      ctx.res.setHeader('Set-Cookie', createAuthCookie(token));
 
       return { token };
     } catch (error) {
@@ -47,7 +58,24 @@ const signUpMutation = publicProcedure
     }
   });
 
+const me = authenticatedProcedure.output(userSchema).query(async ({ ctx }) => {
+  try {
+    const user = await getUserById(ctx.user.id);
+    if (!user) {
+      throw TRPCServerError.unauthorized();
+    }
+    return {
+      id: user.id,
+      username: user.username,
+    };
+  } catch (error) {
+    console.log(error);
+    throw TRPCServerError.internalError();
+  }
+});
+
 export const authRouter = router({
   signIn: signInMuatation,
   signUp: signUpMutation,
+  me,
 });
