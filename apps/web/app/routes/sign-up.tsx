@@ -4,7 +4,7 @@ import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { Birthdate } from '~/components/shared/birthdate';
 import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
+import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { trpc } from '~/lib/trpc';
@@ -69,87 +69,85 @@ export default function SignUpPage() {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
+      <Card className="min-w-xl">
+        <CardHeader>
           <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
             Get started on Instagram
           </h1>
           <p>Sign up to see photos and videos from your friends.</p>
-        </header>
-        <Card className="min-w-xl">
-          <CardContent>
-            {actionData?.error && (
-              <p className="text-sm text-red-500">{actionData.error}</p>
-            )}
-            <Form method="post" className="space-y-8">
-              <div className="flex flex-col gap-2">
-                <Label>Email</Label>
-                <Input placeholder="your-email@address.com" name="email" />
-                {actionData?.errors?.email && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.email}</span>
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Password</Label>
-                <Input name="password" type="password" placeholder="••••••••" />
-                {actionData?.errors?.password && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.password}</span>
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Confirm Password</Label>
-                <Input type="password" placeholder="••••••••" name="confirm" />
-                {actionData?.errors?.confirm && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.confirm}</span>
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Birthday</Label>
-                <Birthdate />
-                {actionData?.errors?.birthdate && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.birthdate}</span>
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Fullname</Label>
-                <Input type="text" placeholder="Fullname" name="name" />
-                {actionData?.errors?.name && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.name}</span>
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Username</Label>
-                <Input type="text" placeholder="Username" name="username" />
-                {actionData?.errors?.username && (
-                  <p className="text-sm text-red-500">
-                    <span>{actionData.errors.username}</span>
-                  </p>
-                )}
-              </div>
-              <Button type="submit" className="w-full">
-                {isSubmitting ? (
-                  <>
-                    <Loader2Icon className="animate-spin" />
-                    Signing Up...
-                  </>
-                ) : (
-                  'Sign Up'
-                )}
-              </Button>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+        </CardHeader>
+        <CardContent>
+          {actionData?.error && (
+            <p className="text-sm text-red-500">{actionData.error}</p>
+          )}
+          <Form method="post" className="space-y-8">
+            <div className="flex flex-col gap-2">
+              <Label>Email</Label>
+              <Input placeholder="your-email@address.com" name="email" />
+              {actionData?.errors?.email && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.email}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Password</Label>
+              <Input name="password" type="password" placeholder="••••••••" />
+              {actionData?.errors?.password && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.password}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Confirm Password</Label>
+              <Input type="password" placeholder="••••••••" name="confirm" />
+              {actionData?.errors?.confirm && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.confirm}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Birthday</Label>
+              <Birthdate />
+              {actionData?.errors?.birthdate && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.birthdate}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Fullname</Label>
+              <Input type="text" placeholder="Fullname" name="name" />
+              {actionData?.errors?.name && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.name}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Username</Label>
+              <Input type="text" placeholder="Username" name="username" />
+              {actionData?.errors?.username && (
+                <p className="text-sm text-red-500">
+                  <span>{actionData.errors.username}</span>
+                </p>
+              )}
+            </div>
+            <Button type="submit" className="w-full">
+              {isSubmitting ? (
+                <>
+                  <Loader2Icon className="animate-spin" />
+                  Signing Up...
+                </>
+              ) : (
+                'Sign Up'
+              )}
+            </Button>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
