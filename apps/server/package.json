@@ -16,6 +16,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.839.0",
     "@ig-clone/database": "workspace:*",
     "@ig-clone/schema": "workspace:*",
     "bcrypt": "^6.0.0",
@@ -32,7 +33,9 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^1.4.13",
     "@types/node": "^24.0.3",
+    "multer": "^2.0.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
