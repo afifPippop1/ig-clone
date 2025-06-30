@@ -5,11 +5,9 @@
   "scripts": {
     "watch:server": "pnpm --filter @ig-clone/server build:watch",
     "watch:database": "pnpm --filter @ig-clone/database build:watch",
-    "watch:schema": "pnpm --filter @ig-clone/schema build:watch",
     "build:server": "pnpm --filter @ig-clone/server build",
     "build:database": "pnpm --filter @ig-clone/database build",
-    "build:schema": "pnpm --filter @ig-clone/schema build",
-    "dev": "concurrently \"pnpm watch:server\" \"pnpm watch:database\" \"pnpm watch:schema\" \"pnpm run dev:server\" \"pnpm run dev:web\"",
+    "dev": "concurrently \"pnpm watch:server\" \"pnpm watch:database\" \"pnpm run dev:server\" \"pnpm run dev:web\"",
     "dev:server": "pnpm --filter @ig-clone/server dev",
     "dev:web": "pnpm --filter @ig-clone/web dev",
     "db:generate": "pnpm --filter @ig-clone/database db:generate",

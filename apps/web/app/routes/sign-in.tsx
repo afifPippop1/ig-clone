@@ -1,4 +1,4 @@
-import { signInSchema, SignInSchema } from '@ig-clone/schema';
+import { signInSchema, SignInSchema } from '@ig-clone/database';
 import { ActionFunctionArgs } from '@remix-run/node';
 import { data, Form, useActionData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';

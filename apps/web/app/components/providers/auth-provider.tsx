@@ -1,10 +1,10 @@
-import { UserSchema } from '@ig-clone/schema';
+import { PublicUserSchema } from '@ig-clone/database';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, ReactNode, useContext } from 'react';
 import { useTRPC } from '~/lib/trpc';
 
 interface AuthContextValue {
-  user?: UserSchema | null;
+  user?: PublicUserSchema | null;
 }
 
 const AuthContext = createContext<AuthContextValue>({

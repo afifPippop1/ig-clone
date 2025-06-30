@@ -1,4 +1,4 @@
-import { signUpSchema, SignUpSchema } from '@ig-clone/schema';
+import { signUpSchema, SignUpSchema } from '@ig-clone/database';
 import { ActionFunctionArgs } from '@remix-run/node';
 import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
@@ -23,11 +23,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { errors };
     }
 
-    const { email, password, birthdate, confirm, name, username } = result.data;
+    const { email, password, birthdate, name, username } = result.data;
     const response = await trpc.auth.signUp.mutate({
       email,
       password,
-      confirm,
       birthdate,
       name,
       username,
@@ -96,15 +95,6 @@ export default function SignUpPage() {
               {actionData?.errors?.password && (
                 <p className="text-sm text-red-500">
                   <span>{actionData.errors.password}</span>
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label>Confirm Password</Label>
-              <Input type="password" placeholder="••••••••" name="confirm" />
-              {actionData?.errors?.confirm && (
-                <p className="text-sm text-red-500">
-                  <span>{actionData.errors.confirm}</span>
                 </p>
               )}
             </div>
