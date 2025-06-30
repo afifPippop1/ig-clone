@@ -3,6 +3,7 @@ import { useLoaderData } from '@remix-run/react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
 import { useUser } from '~/components/providers/auth-provider';
+import { Profile } from '~/components/shared/profile';
 import { useTRPC } from '~/lib/trpc';
 
 export function loader({ params }: LoaderFunctionArgs) {
@@ -40,7 +41,12 @@ export default function ProfilePage() {
   }
 
   if (isUserProfile) {
-    return <div>This is You</div>;
+    return (
+      <div>
+        This is You
+        <Profile />
+      </div>
+    );
   }
 
   return <div>{JSON.stringify(user)}</div>;

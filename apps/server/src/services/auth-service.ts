@@ -1,6 +1,6 @@
 import { prisma } from '@ig-clone/database';
-import { SignInSchema, SignUpSchema } from '@ig-clone/schema';
 import bcrypt from 'bcrypt';
+import { SignInSchema, SignUpSchema } from '~/schema/auth-schema';
 import { TRPCServerError } from '~/utils/error';
 import { JWT } from '~/utils/jwt';
 

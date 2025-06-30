@@ -1,7 +1,7 @@
 import { prisma } from '@ig-clone/database';
-import { userSchema } from '@ig-clone/schema';
 import { z } from 'zod';
 import { authenticatedProcedure, router } from '~/lib/trpc';
+import { publicUserSchema } from '~/schema/user-schema';
 import { TRPCServerError } from '~/utils/error';
 
 const getUser = authenticatedProcedure
@@ -10,7 +10,7 @@ const getUser = authenticatedProcedure
       username: z.string(),
     })
   )
-  .output(userSchema)
+  .output(publicUserSchema)
   .query(async ({ input }) => {
     const { username } = input;
     const user = await prisma.user.findFirst({

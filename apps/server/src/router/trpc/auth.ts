@@ -1,6 +1,7 @@
-import { Prisma } from '@ig-clone/database';
-import { signInSchema, signUpSchema, userSchema } from '@ig-clone/schema';
+import { Prisma, ZodPrisma } from '@ig-clone/database';
 import { authenticatedProcedure, publicProcedure, router } from '~/lib/trpc';
+import { signInSchema, signUpSchema } from '~/schema/auth-schema';
+import { publicUserSchema } from '~/schema/user-schema';
 import { createUser, signInService } from '~/services/auth-service';
 import { getUserById } from '~/services/user-service';
 import { TRPCErrorCode, TRPCServerError } from '~/utils/error';
@@ -15,7 +16,7 @@ function createAuthCookie(token: string) {
   }; SameSite=Lax; ${process.env.NODE_ENV === 'production' ? 'Secure' : ''}`;
 }
 
-const signInMuatation = publicProcedure
+const signIn = publicProcedure
   .input(signInSchema)
   .mutation(async ({ input, ctx }) => {
     try {
@@ -36,13 +37,13 @@ const signInMuatation = publicProcedure
     }
   });
 
-const signUpMutation = publicProcedure
+const signUp = publicProcedure
   .input(signUpSchema)
   .mutation(async ({ input }) => {
     try {
-      const { email, password, confirm, birthdate, name, username } = input;
+      const { email, password, birthdate, name, username } = input;
 
-      await createUser({ email, password, confirm, birthdate, name, username });
+      await createUser({ email, password, birthdate, name, username });
 
       return { ok: true, message: 'User created successfully' };
     } catch (error) {
@@ -58,24 +59,27 @@ const signUpMutation = publicProcedure
     }
   });
 
-const me = authenticatedProcedure.output(userSchema).query(async ({ ctx }) => {
-  try {
-    const user = await getUserById(ctx.user.id);
-    if (!user) {
-      throw TRPCServerError.unauthorized();
+const me = authenticatedProcedure
+  .output(publicUserSchema)
+  .query(async ({ ctx }) => {
+    try {
+      const user = await getUserById(ctx.user.id);
+      if (!user.id && !user.username) {
+        throw TRPCServerError.unauthorized();
+      }
+      return {
+        id: user.id as string,
+        username: user.username as string,
+        name: user.name as string,
+      };
+    } catch (error) {
+      console.log(error);
+      throw TRPCServerError.internalError();
     }
-    return {
-      id: user.id,
-      username: user.username,
-    };
-  } catch (error) {
-    console.log(error);
-    throw TRPCServerError.internalError();
-  }
-});
+  });
 
 export const authRouter = router({
-  signIn: signInMuatation,
-  signUp: signUpMutation,
+  signIn,
+  signUp,
   me,
 });

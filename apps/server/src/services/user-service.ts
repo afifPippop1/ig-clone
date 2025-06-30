@@ -1,5 +1,9 @@
 import { prisma } from '@ig-clone/database';
 
 export async function getUserById(id: string) {
-  return await prisma.user.findFirst({ where: { id } });
+  const [user, profile] = await Promise.all([
+    prisma.user.findFirst({ where: { id } }),
+    prisma.profile.findFirst({ where: { id } }),
+  ]);
+  return { ...user, ...profile };
 }
