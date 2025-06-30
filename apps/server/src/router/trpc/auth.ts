@@ -1,7 +1,10 @@
-import { Prisma, ZodPrisma } from '@ig-clone/database';
+import {
+  Prisma,
+  publicUserSchema,
+  signInSchema,
+  signUpSchema,
+} from '@ig-clone/database';
 import { authenticatedProcedure, publicProcedure, router } from '~/lib/trpc';
-import { signInSchema, signUpSchema } from '~/schema/auth-schema';
-import { publicUserSchema } from '~/schema/user-schema';
 import { createUser, signInService } from '~/services/auth-service';
 import { getUserById } from '~/services/user-service';
 import { TRPCErrorCode, TRPCServerError } from '~/utils/error';

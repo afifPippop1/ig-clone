@@ -1,7 +1,6 @@
-import { prisma } from '@ig-clone/database';
+import { prisma, publicUserSchema } from '@ig-clone/database';
 import { z } from 'zod';
 import { authenticatedProcedure, router } from '~/lib/trpc';
-import { publicUserSchema } from '~/schema/user-schema';
 import { TRPCServerError } from '~/utils/error';
 
 const getUser = authenticatedProcedure

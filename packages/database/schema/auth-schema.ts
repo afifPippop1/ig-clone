@@ -1,9 +1,7 @@
-import { ZodPrisma } from '@ig-clone/database';
 import { z } from 'zod';
+import { ProfileSchema, UserSchema } from '../prisma/generated/zod';
 
-export const signUpSchema = ZodPrisma.UserSchema.merge(
-  ZodPrisma.ProfileSchema
-).pick({
+export const signUpSchema = UserSchema.merge(ProfileSchema).pick({
   email: true,
   password: true,
   birthdate: true,
@@ -12,7 +10,7 @@ export const signUpSchema = ZodPrisma.UserSchema.merge(
 });
 export type SignUpSchema = z.infer<typeof signUpSchema>;
 
-export const signInSchema = ZodPrisma.UserSchema.pick({
+export const signInSchema = UserSchema.pick({
   email: true,
   password: true,
 });
