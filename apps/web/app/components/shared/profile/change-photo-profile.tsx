@@ -44,14 +44,31 @@ export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
     inputRef.current?.click();
   }
 
-  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+  async function updatePhotoProfile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
     if (file) {
       onClose();
       const res = await upload(file);
       const photoProfilePath: string = `http://localhost:4000/img?url=${res.url as string}`;
       await mutation.mutateAsync({ photoProfilePath });
     }
+  }
+
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    toast.promise(updatePhotoProfile(e), {
+      loading: 'Updating photo profile',
+      success: () => 'Successfully update photo profile',
+      error: () => 'Failed to update photo profile',
+    });
+  }
+
+  async function removePhotoProfile() {
+    onClose();
+    toast.promise(mutation.mutateAsync({ photoProfilePath: '' }), {
+      loading: 'Updating photo profile',
+      success: () => 'Successfully update photo profile',
+      error: () => 'Failed to update photo profile',
+    });
   }
 
   if (!props.isAuthorized) {
@@ -72,13 +89,7 @@ export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
               accept="image/*"
               ref={inputRef}
               className="hidden"
-              onChange={(e) => {
-                toast.promise(handleFileChange(e), {
-                  loading: 'Updating photo profile',
-                  success: () => 'Successfully update photo profile',
-                  error: () => 'Failed to update photo profile',
-                });
-              }}
+              onChange={handleFileChange}
             />
             <Button
               variant="ghost"
@@ -87,7 +98,11 @@ export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
             >
               Upload Photo
             </Button>
-            <Button variant="ghost" className="text-red-500">
+            <Button
+              variant="ghost"
+              className="text-red-500"
+              onClick={removePhotoProfile}
+            >
               Remove Current Photo
             </Button>
             <Button variant="ghost" className="w-full" onClick={onClose}>
