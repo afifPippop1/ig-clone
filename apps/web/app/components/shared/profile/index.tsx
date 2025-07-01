@@ -1,16 +1,20 @@
 import { PublicUserSchema } from '@ig-clone/database';
-import { PhotoProfile } from './photo-profile';
 import { ChangePhotoProfileDialog } from './change-photo-profile';
+import { PhotoProfile } from './photo-profile';
 
 interface ProfileProps {
   user: PublicUserSchema;
+  isCurrentUser?: boolean;
 }
 
 export function Profile(props: ProfileProps) {
   return (
     <div className="flex gap-8">
-      <ChangePhotoProfileDialog>
-        <PhotoProfile fallback={props.user.username[0]} />
+      <ChangePhotoProfileDialog isAuthorized={props.isCurrentUser}>
+        <PhotoProfile
+          src={props.user.photoProfilePath || ''}
+          fallback={props.user.username[0]}
+        />
       </ChangePhotoProfileDialog>
       <ProfileInfo {...props} />
     </div>

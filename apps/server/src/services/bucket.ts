@@ -1,5 +1,4 @@
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { env } from '~/lib/env';
 import { s3 } from '~/lib/s3';
 
 export class Bucket {
@@ -11,12 +10,12 @@ export class Bucket {
       new PutObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-        Body: file.buffer, // or fs.createReadStream()
+        Body: file.buffer,
         ContentType: file.mimetype,
       })
     );
 
-    return `${env.BUCKET_URL}/${this.bucketName}/${key}`;
+    return key;
   }
 
   async getFile(key: string) {

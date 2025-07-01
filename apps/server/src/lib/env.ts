@@ -10,6 +10,7 @@ const envSchema = z.object({
   BUCKET_ACCESS_KEY_ID: z.string().default('minioadmin'),
   BUCKET_SECRET_ACCESS_KEY: z.string().default('minioadmin'),
   BUCKET_REGION: z.string().default('us-east-1'),
+  BACKEND_URL: z.string().default('http://localhost:4000'),
 });
 
 export const env = envSchema.parse(process.env);

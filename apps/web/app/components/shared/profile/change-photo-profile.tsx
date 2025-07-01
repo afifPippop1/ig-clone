@@ -1,64 +1,102 @@
-import { ChangeEvent, ReactNode, useRef } from 'react';
+import { useParams } from '@remix-run/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ChangeEvent, ReactNode, useRef, useState } from 'react';
 import { useUpload } from '~/api/upload';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTrigger,
 } from '~/components/ui/dialog';
+import { useTRPC } from '~/lib/trpc';
+import { Toaster } from '~/components/ui/sonner';
+import { toast } from 'sonner';
 
 interface ChangePhotoProfileDialogProps {
   children: ReactNode;
+  isAuthorized?: boolean;
 }
 
 export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
+  const [open, setOpen] = useState<boolean>(false);
+
+  function onClose() {
+    setOpen(false);
+  }
+
   const inputRef = useRef<HTMLInputElement>(null);
   const { upload } = useUpload();
+  const trpc = useTRPC();
+  const params = useParams();
+  const username = params.username || '';
+  const query = useQuery(trpc.users.getUser.queryOptions({ username }));
+  const mutation = useMutation(
+    trpc.users.updateUser.mutationOptions({
+      onSuccess: () => {
+        query.refetch();
+      },
+    }),
+  );
+
   function handleFileUploadClick() {
     inputRef.current?.click();
   }
+
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
-      console.log('Selected file:', file);
+      onClose();
       const res = await upload(file);
-      console.log(res);
+      const photoProfilePath: string = `http://localhost:4000/img?url=${res.url as string}`;
+      await mutation.mutateAsync({ photoProfilePath });
     }
   }
 
+  if (!props.isAuthorized) {
+    return props.children;
+  }
+
   return (
-    <Dialog>
-      <DialogTrigger className="cursor-pointer">{props.children}</DialogTrigger>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>Change Photo Profile</DialogHeader>
-        <DialogDescription className="flex flex-col">
-          <input
-            type="file"
-            accept="image/*"
-            ref={inputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <Button
-            variant="ghost"
-            className="text-primary"
-            onClick={handleFileUploadClick}
-          >
-            Upload Photo
-          </Button>
-          <Button variant="ghost" className="text-red-500">
-            Remove Current Photo
-          </Button>
-          <DialogClose>
-            <Button variant="ghost" className="w-full">
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger className="cursor-pointer">
+          {props.children}
+        </DialogTrigger>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>Change Photo Profile</DialogHeader>
+          <DialogDescription className="flex flex-col">
+            <input
+              type="file"
+              accept="image/*"
+              ref={inputRef}
+              className="hidden"
+              onChange={(e) => {
+                toast.promise(handleFileChange(e), {
+                  loading: 'Updating photo profile',
+                  success: () => 'Successfully update photo profile',
+                  error: () => 'Failed to update photo profile',
+                });
+              }}
+            />
+            <Button
+              variant="ghost"
+              className="text-primary"
+              onClick={handleFileUploadClick}
+            >
+              Upload Photo
+            </Button>
+            <Button variant="ghost" className="text-red-500">
+              Remove Current Photo
+            </Button>
+            <Button variant="ghost" className="w-full" onClick={onClose}>
               Cancel
             </Button>
-          </DialogClose>
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+      <Toaster />
+    </>
   );
 }

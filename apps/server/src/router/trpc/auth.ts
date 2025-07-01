@@ -75,7 +75,7 @@ const me = authenticatedProcedure
         id: user.id as string,
         username: user.username as string,
         name: user.name as string,
-        photoProfilePath: '',
+        photoProfilePath: user.photoProfilePath as string,
       };
     } catch (error) {
       console.log(error);

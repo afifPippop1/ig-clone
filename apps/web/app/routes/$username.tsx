@@ -41,7 +41,7 @@ export default function ProfilePage() {
   }
 
   if (isUserProfile) {
-    return <Profile user={user} />;
+    return <Profile user={user} isCurrentUser />;
   }
 
   return <Profile user={user} />;

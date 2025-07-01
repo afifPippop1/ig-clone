@@ -1,4 +1,4 @@
-import { prisma, publicUserSchema } from '@ig-clone/database';
+import { prisma, publicUserSchema, ZodPrisma } from '@ig-clone/database';
 import { z } from 'zod';
 import { authenticatedProcedure, router } from '~/lib/trpc';
 import { TRPCServerError } from '~/utils/error';
@@ -28,12 +28,24 @@ const getUser = authenticatedProcedure
     return { username: user.username, ...profile };
   });
 
+const updateUser = authenticatedProcedure
+  .input(ZodPrisma.ProfileSchema.partial())
+  .mutation(async ({ ctx, input }) => {
+    try {
+      await prisma.profile.update({
+        where: { id: ctx.user.id },
+        data: input,
+      });
+      return {
+        ok: true,
+        message: 'User successfully updated',
+      };
+    } catch {
+      throw TRPCServerError.internalError();
+    }
+  });
+
 export const usersRouter = router({
-  list: authenticatedProcedure.query(() => {
-    return [
-      { id: '1', name: 'John Doe' },
-      { id: '2', name: 'Jane Smith' },
-    ];
-  }),
   getUser,
+  updateUser,
 });
