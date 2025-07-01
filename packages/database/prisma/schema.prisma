@@ -27,9 +27,10 @@ model User {
 }
 
 model Profile {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  birthdate DateTime
+  id               String   @id
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  name             String
+  birthdate        DateTime
+  photoProfilePath String?
 }

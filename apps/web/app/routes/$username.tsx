@@ -41,13 +41,8 @@ export default function ProfilePage() {
   }
 
   if (isUserProfile) {
-    return (
-      <div>
-        This is You
-        <Profile />
-      </div>
-    );
+    return <Profile user={user} />;
   }
 
-  return <div>{JSON.stringify(user)}</div>;
+  return <Profile user={user} />;
 }

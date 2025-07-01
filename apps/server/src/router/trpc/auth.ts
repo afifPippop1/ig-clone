@@ -70,10 +70,12 @@ const me = authenticatedProcedure
       if (!user.id && !user.username) {
         throw TRPCServerError.unauthorized();
       }
+
       return {
         id: user.id as string,
         username: user.username as string,
         name: user.name as string,
+        photoProfilePath: '',
       };
     } catch (error) {
       console.log(error);

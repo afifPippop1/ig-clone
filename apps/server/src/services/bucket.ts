@@ -1,4 +1,4 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '~/lib/env';
 import { s3 } from '~/lib/s3';
 
@@ -17,5 +17,14 @@ export class Bucket {
     );
 
     return `${env.BUCKET_URL}/${this.bucketName}/${key}`;
+  }
+
+  async getFile(key: string) {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+
+    return await s3.send(command);
   }
 }

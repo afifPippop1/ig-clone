@@ -5,6 +5,7 @@ export const publicUserSchema = UserSchema.merge(ProfileSchema).pick({
   id: true,
   username: true,
   name: true,
+  photoProfilePath: true,
 });
 
 export type PublicUserSchema = z.infer<typeof publicUserSchema>;

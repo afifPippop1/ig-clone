@@ -1,20 +1,28 @@
+import { PublicUserSchema } from '@ig-clone/database';
 import { PhotoProfile } from './photo-profile';
+import { ChangePhotoProfileDialog } from './change-photo-profile';
 
-export function Profile() {
+interface ProfileProps {
+  user: PublicUserSchema;
+}
+
+export function Profile(props: ProfileProps) {
   return (
-    <div className="flex gap-4">
-      <PhotoProfile />
-      <ProfileInfo />
+    <div className="flex gap-8">
+      <ChangePhotoProfileDialog>
+        <PhotoProfile fallback={props.user.username[0]} />
+      </ChangePhotoProfileDialog>
+      <ProfileInfo {...props} />
     </div>
   );
 }
 
-function ProfileInfo() {
+function ProfileInfo(props: ProfileProps) {
   return (
-    <div className="flex flex-col">
-      <p>pippop</p>
+    <div className="flex flex-col gap-4">
+      <p className="font-bold">{props.user.username}</p>
       <ProfileFollower />
-      <p>Afif</p>
+      <p>{props.user.name}</p>
     </div>
   );
 }
