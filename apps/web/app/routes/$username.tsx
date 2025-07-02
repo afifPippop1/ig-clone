@@ -1,26 +1,35 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { useQuery } from '@tanstack/react-query';
+import { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import { useLoaderData, useNavigation } from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useUser } from '~/components/providers/auth-provider';
 import { Profile } from '~/components/shared/profile';
-import { useTRPC } from '~/lib/trpc';
+import { authCookie } from '~/lib/auth';
+import { makeTRPC } from '~/lib/trpc';
 
-export function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { username = '' } = params;
-  return { username };
+  const cookieString = request.headers.get('Cookie');
+  const token: string = await authCookie.parse(cookieString);
+  const trpc = makeTRPC(token);
+  const user = await trpc.users.getUser.query({ username });
+  return { user };
 }
 
-export default function ProfilePage() {
-  const { username } = useLoaderData<typeof loader>();
-  const signInUser = useUser();
-  const trpc = useTRPC();
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    {
+      title: `${data?.user.name}(@${data?.user.username})`,
+    },
+  ];
+};
 
-  const userQuery = useQuery(trpc.users.getUser.queryOptions({ username }));
-  const user = userQuery.data;
+export default function ProfilePage() {
+  const { user } = useLoaderData<typeof loader>();
+  const { state } = useNavigation();
+  const signInUser = useUser();
   const isUserProfile: boolean = signInUser.user?.id === user?.id;
 
-  if (userQuery.isLoading) {
+  if (state === 'loading') {
     return (
       <div>
         <Loader2Icon className="animate-spin" />

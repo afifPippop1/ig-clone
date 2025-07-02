@@ -1,20 +1,20 @@
+import { AppRouter } from '@ig-clone/server';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 import {
   Links,
   Meta,
-  Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
 } from '@remix-run/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import { useState } from 'react';
+import { AuthenticatedLayout } from './components/layouts/authenticated-layout';
+import { AuthProvider } from './components/providers/auth-provider';
+import { TRPCProvider } from './lib/trpc';
 import { authMiddleware } from './middlewares/auth-middleware';
 import './tailwind.css';
-import { TRPCProvider } from './lib/trpc';
-import { useState } from 'react';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { AppRouter } from '@ig-clone/server';
-import { AuthProvider } from './components/providers/auth-provider';
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -99,7 +99,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         <AuthProvider>
-          <Outlet />
+          <AuthenticatedLayout />
         </AuthProvider>
       </TRPCProvider>
     </QueryClientProvider>
