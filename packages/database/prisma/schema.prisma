@@ -24,6 +24,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Posts     Posts[]
 }
 
 model Profile {
@@ -33,4 +34,15 @@ model Profile {
   name             String
   birthdate        DateTime
   photoProfilePath String?
+}
+
+model Posts {
+  id         String   @id @default(uuid())
+  userId     String
+  contentUrl String
+  caption    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }

@@ -2,6 +2,7 @@ import { PublicUserSchema } from '@ig-clone/database';
 import { ChangePhotoProfileDialog } from './change-photo-profile';
 import { PhotoProfile } from './photo-profile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { PostsPhoto } from './posts-photo';
 
 interface ProfileProps {
   user: PublicUserSchema;
@@ -64,7 +65,9 @@ function ProfilePhotos() {
           </TabsTrigger>
         </TabsList>
       </div>
-      <TabsContent value="posts"></TabsContent>
+      <TabsContent value="posts">
+        <PostsPhoto />
+      </TabsContent>
       <TabsContent value="saved"></TabsContent>
     </Tabs>
   );

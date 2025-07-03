@@ -1,10 +1,8 @@
 import { PublicUserSchema } from '@ig-clone/database';
-import { useQuery } from '@tanstack/react-query';
 import { createContext, ReactNode, useContext } from 'react';
-import { useTRPC } from '~/lib/trpc';
 
 interface AuthContextValue {
-  user?: PublicUserSchema | null;
+  user: PublicUserSchema | null;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -13,12 +11,10 @@ const AuthContext = createContext<AuthContextValue>({
 
 interface AuthProviderProps {
   children: ReactNode;
+  user: PublicUserSchema;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const trpc = useTRPC();
-  const userQuery = useQuery(trpc.auth.me.queryOptions());
-  const user = userQuery.data;
+export function AuthProvider({ children, user }: AuthProviderProps) {
   return (
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
   );

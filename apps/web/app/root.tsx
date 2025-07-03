@@ -88,7 +88,7 @@ export default function App() {
         httpBatchLink({
           url: 'http://localhost:4000',
           headers() {
-            return { Authorization: `Bearer ${dataLoader.userId}` };
+            return { Authorization: `Bearer ${dataLoader.token}` };
           },
         }),
       ],
@@ -98,7 +98,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <AuthProvider>
+        <AuthProvider user={dataLoader.user}>
           <AuthenticatedLayout />
         </AuthProvider>
       </TRPCProvider>
