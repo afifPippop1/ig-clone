@@ -33,7 +33,10 @@ export function LikeButton({ postId }: LikeButtonProps) {
 
   return (
     <Button variant="link" onClick={onClick}>
-      <Heart fill={query.data ? '#ff0000' : 'none'} />
+      <Heart
+        fill={query.data ? '#ff0000' : 'none'}
+        color={query.data ? '#ff0000' : undefined}
+      />
     </Button>
   );
 }
