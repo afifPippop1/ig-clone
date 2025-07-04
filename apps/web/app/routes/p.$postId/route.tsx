@@ -1,5 +1,6 @@
 import { useParams } from '@remix-run/react';
 import { useQuery } from '@tanstack/react-query';
+import { LikeButton } from '~/components/shared/posts/like-button';
 import { useTRPC } from '~/lib/trpc';
 
 export default function PostPage() {
@@ -10,6 +11,7 @@ export default function PostPage() {
   return (
     <div>
       <img src={data?.contentUrl} alt={data?.caption || ''} className="w-5xl" />
+      <LikeButton postId={postId} />
     </div>
   );
 }
