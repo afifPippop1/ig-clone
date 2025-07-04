@@ -1,17 +1,22 @@
-import { Camera } from 'lucide-react';
-import { Button } from '~/components/ui/button';
-import { PostPhotoDialog } from './post-photo-dialog';
+import { useNavigate, useParams } from '@remix-run/react';
 import { useQuery } from '@tanstack/react-query';
-import { useTRPC } from '~/lib/trpc';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Camera } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '~/components/ui/button';
+import { Skeleton } from '~/components/ui/skeleton';
+import { useTRPC } from '~/lib/trpc';
+import { PostPhotoDialog } from './post-photo-dialog';
 
 const SKELETON = [1, 2, 3, 4, 5, 6];
 
 export function PostsPhoto() {
   const trpc = useTRPC();
-
-  const { data, isLoading } = useQuery(trpc.post.getFeed.queryOptions());
+  const navigate = useNavigate();
+  const params = useParams();
+  const username = params.username || '';
+  const { data, isLoading } = useQuery(
+    trpc.post.getFeed.queryOptions({ username }),
+  );
 
   if (isLoading) {
     return (
@@ -28,7 +33,12 @@ export function PostsPhoto() {
   return (
     <div className="grid grid-cols-4 gap-1">
       {data.map((post) => (
-        <div key={post.id} className="aspect-square overflow-hidden">
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div
+          key={post.id}
+          className="aspect-square overflow-hidden cursor-pointer"
+          onClick={() => navigate(`/p/${post.id}`)}
+        >
           <img
             src={post.contentUrl}
             alt={post.caption || ''}

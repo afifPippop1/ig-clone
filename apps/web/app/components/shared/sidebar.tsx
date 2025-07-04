@@ -14,7 +14,7 @@ export function Sidebar() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col items-stretch min-w-56 relative">
+    <div className="flex flex-col items-stretch gap-4 min-w-56 relative border-r border-r-primary p-4">
       <h2>Clonegram</h2>
       <SidebarMenu icon={Home} onClick={() => navigate('/')}>
         Home
