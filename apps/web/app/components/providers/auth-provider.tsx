@@ -11,7 +11,7 @@ const AuthContext = createContext<AuthContextValue>({
 
 interface AuthProviderProps {
   children: ReactNode;
-  user: PublicUserSchema;
+  user: PublicUserSchema | null;
 }
 
 export function AuthProvider({ children, user }: AuthProviderProps) {
