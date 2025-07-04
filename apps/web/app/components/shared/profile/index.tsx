@@ -1,7 +1,8 @@
 import { PublicUserSchema } from '@ig-clone/database';
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { ChangePhotoProfileDialog } from './change-photo-profile';
 import { PhotoProfile } from './photo-profile';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { PostsPhoto } from './posts-photo';
 
 interface ProfileProps {
@@ -10,19 +11,25 @@ interface ProfileProps {
 }
 
 export function Profile(props: ProfileProps) {
+  const [open, onOpenChange] = useState<boolean>(false);
+  function onClick() {
+    onOpenChange(true);
+  }
   return (
-    <div className="flex flex-col items-stretch">
-      <div className="flex gap-8">
-        <ChangePhotoProfileDialog isAuthorized={props.isCurrentUser}>
-          <PhotoProfile
-            src={props.user.photoProfilePath || ''}
-            fallback={props.user.username[0]}
-          />
-        </ChangePhotoProfileDialog>
-        <ProfileInfo {...props} />
+    <>
+      <div className="flex flex-col items-stretch">
+        <div className="flex gap-8">
+          <PhotoProfile className="cursor-pointer" onClick={onClick} />
+          <ProfileInfo {...props} />
+        </div>
+        <Posts />
       </div>
-      <ProfilePhotos />
-    </div>
+      <ChangePhotoProfileDialog
+        isAuthorized={props.isCurrentUser}
+        open={open}
+        onOpenChange={onOpenChange}
+      />
+    </>
   );
 }
 
@@ -52,7 +59,7 @@ function ProfileFollower() {
   );
 }
 
-function ProfilePhotos() {
+function Posts() {
   return (
     <Tabs defaultValue="posts">
       <div className="w-full flex items-center justify-center">

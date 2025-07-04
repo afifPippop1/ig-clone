@@ -1,22 +1,19 @@
 import { DialogProps } from '@radix-ui/react-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ImagePlus } from 'lucide-react';
-import { ChangeEvent, ReactNode, useRef } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { useUpload } from '~/api/upload';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogTrigger,
 } from '~/components/ui/dialog';
 import { useTRPC } from '~/lib/trpc';
 
-interface PostPhotoDialogProps extends DialogProps {
-  children: ReactNode;
-}
+interface PostPhotoDialogProps extends DialogProps {}
 
-export function PostPhotoDialog({ children, ...props }: PostPhotoDialogProps) {
+export function PostPhotoDialog(props: PostPhotoDialogProps) {
   const ref = useRef<HTMLInputElement>(null);
   const trpc = useTRPC();
   const { upload } = useUpload();
@@ -47,7 +44,6 @@ export function PostPhotoDialog({ children, ...props }: PostPhotoDialogProps) {
   }
   return (
     <Dialog {...props}>
-      <DialogTrigger className="cursor-pointer">{children}</DialogTrigger>
       <DialogContent>
         <DialogDescription className="flex flex-col items-center justify-center gap-4">
           <input

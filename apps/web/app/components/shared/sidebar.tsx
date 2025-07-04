@@ -1,11 +1,7 @@
 import { useNavigate } from '@remix-run/react';
 import { Home, LucideProps, PlusSquare, Search, User } from 'lucide-react';
-import {
-  ForwardRefExoticComponent,
-  ReactNode,
-  RefAttributes,
-  useState,
-} from 'react';
+import { ForwardRefExoticComponent, RefAttributes, useState } from 'react';
+import { ButtonProps } from 'react-day-picker';
 import { useUser } from '../providers/auth-provider';
 import { Button } from '../ui/button';
 import { PostPhotoDialog } from './profile/post-photo-dialog';
@@ -15,8 +11,10 @@ export function Sidebar() {
   const { user } = useUser();
   const [open, setOpen] = useState<boolean>(false);
 
+  if (!user) return null;
+
   return (
-    <div className="flex flex-col items-stretch min-w-56">
+    <div className="flex flex-col items-stretch min-w-56 relative">
       <h2>Clonegram</h2>
       <SidebarMenu icon={Home} onClick={() => navigate('/')}>
         Home
@@ -25,19 +23,18 @@ export function Sidebar() {
       <SidebarMenu icon={User} onClick={() => navigate(`/${user?.username}`)}>
         Profile
       </SidebarMenu>
-      <PostPhotoDialog open={open} onOpenChange={setOpen}>
-        <SidebarMenu icon={PlusSquare}>Create</SidebarMenu>
-      </PostPhotoDialog>
+      <SidebarMenu icon={PlusSquare} onClick={() => setOpen(true)}>
+        Create
+      </SidebarMenu>
+      <PostPhotoDialog open={open} onOpenChange={setOpen} />
     </div>
   );
 }
 
-interface SidebarMenuProps {
+interface SidebarMenuProps extends ButtonProps {
   icon: ForwardRefExoticComponent<
     Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
   >;
-  children: ReactNode;
-  onClick?: () => void;
 }
 
 function SidebarMenu(props: SidebarMenuProps) {

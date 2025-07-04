@@ -1,15 +1,17 @@
+import { ButtonProps } from 'react-day-picker';
+import { useUser } from '~/components/providers/auth-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { cn } from '~/lib/utils';
 
-interface PhotoProfileProps {
-  src?: string;
-  fallback: string;
-}
+interface PhotoProfileProps extends ButtonProps {}
 
-export function PhotoProfile(props: PhotoProfileProps) {
+export function PhotoProfile({ className, ...props }: PhotoProfileProps) {
+  const { user } = useUser();
+
   return (
-    <Avatar className="w-40 h-40">
-      <AvatarImage src={props.src} />
-      <AvatarFallback className="text-3xl">{props.fallback}</AvatarFallback>
+    <Avatar className={cn('w-40 h-40', className)} {...props}>
+      <AvatarImage src={user?.photoProfilePath || ''} />
+      <AvatarFallback className="text-3xl">{user?.username[0]}</AvatarFallback>
     </Avatar>
   );
 }

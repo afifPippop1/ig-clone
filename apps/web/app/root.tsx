@@ -3,6 +3,7 @@ import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 import {
   Links,
   Meta,
+  Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
@@ -10,11 +11,12 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { useState } from 'react';
-import { AuthenticatedLayout } from './components/layouts/authenticated-layout';
 import { AuthProvider } from './components/providers/auth-provider';
+import { Sidebar } from './components/shared/sidebar';
 import { TRPCProvider } from './lib/trpc';
 import { authMiddleware } from './middlewares/auth-middleware';
 import './tailwind.css';
+import { Toaster } from './components/ui/sonner';
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -80,7 +82,7 @@ function getQueryClient() {
 }
 
 export default function App() {
-  const dataLoader = useLoaderData<typeof loader>();
+  const { user, token } = useLoaderData<typeof loader>();
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
@@ -88,7 +90,7 @@ export default function App() {
         httpBatchLink({
           url: 'http://localhost:4000',
           headers() {
-            return { Authorization: `Bearer ${dataLoader.token}` };
+            return { Authorization: `Bearer ${token}` };
           },
         }),
       ],
@@ -96,12 +98,18 @@ export default function App() {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <AuthProvider user={dataLoader.user}>
-          <AuthenticatedLayout />
-        </AuthProvider>
-      </TRPCProvider>
-    </QueryClientProvider>
+    <>
+      <Toaster />
+      <div className="h-screen w-screen flex gap-8">
+        <QueryClientProvider client={queryClient}>
+          <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+            <AuthProvider user={user}>
+              <Sidebar />
+              <Outlet />
+            </AuthProvider>
+          </TRPCProvider>
+        </QueryClientProvider>
+      </div>
+    </>
   );
 }

@@ -1,41 +1,36 @@
-import { useParams } from '@remix-run/react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { ChangeEvent, ReactNode, useRef, useState } from 'react';
+import { DialogProps } from '@radix-ui/react-dialog';
+import { useMutation } from '@tanstack/react-query';
+import { ChangeEvent, useRef } from 'react';
+import { toast } from 'sonner';
 import { useUpload } from '~/api/upload';
+import { useUser } from '~/components/providers/auth-provider';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTrigger,
 } from '~/components/ui/dialog';
 import { useTRPC } from '~/lib/trpc';
-import { Toaster } from '~/components/ui/sonner';
-import { toast } from 'sonner';
 
-interface ChangePhotoProfileDialogProps {
-  children: ReactNode;
+interface ChangePhotoProfileDialogProps
+  extends Exclude<DialogProps, 'children'> {
   isAuthorized?: boolean;
 }
 
 export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
-  const [open, setOpen] = useState<boolean>(false);
-
   function onClose() {
-    setOpen(false);
+    props.onOpenChange?.(false);
   }
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const { refetch } = useUser();
   const { upload } = useUpload();
   const trpc = useTRPC();
-  const params = useParams();
-  const username = params.username || '';
-  const query = useQuery(trpc.users.getUser.queryOptions({ username }));
   const mutation = useMutation(
     trpc.users.updateUser.mutationOptions({
       onSuccess: () => {
-        query.refetch();
+        refetch();
       },
     }),
   );
@@ -76,42 +71,36 @@ export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
   }
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger className="cursor-pointer">
-          {props.children}
-        </DialogTrigger>
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>Change Photo Profile</DialogHeader>
-          <DialogDescription className="flex flex-col">
-            <input
-              type="file"
-              accept="image/*"
-              ref={inputRef}
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <Button
-              variant="ghost"
-              className="text-primary"
-              onClick={handleFileUploadClick}
-            >
-              Upload Photo
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-red-500"
-              onClick={removePhotoProfile}
-            >
-              Remove Current Photo
-            </Button>
-            <Button variant="ghost" className="w-full" onClick={onClose}>
-              Cancel
-            </Button>
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
-      <Toaster />
-    </>
+    <Dialog {...props}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>Change Photo Profile</DialogHeader>
+        <DialogDescription className="flex flex-col">
+          <input
+            type="file"
+            accept="image/*"
+            ref={inputRef}
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="ghost"
+            className="text-primary"
+            onClick={handleFileUploadClick}
+          >
+            Upload Photo
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-red-500"
+            onClick={removePhotoProfile}
+          >
+            Remove Current Photo
+          </Button>
+          <Button variant="ghost" className="w-full" onClick={onClose}>
+            Cancel
+          </Button>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
   );
 }
