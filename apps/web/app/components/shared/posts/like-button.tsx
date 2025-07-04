@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
-import { Button } from '~/components/ui/button';
 import { useTRPC } from '~/lib/trpc';
 
 interface LikeButtonProps {
@@ -32,11 +31,12 @@ export function LikeButton({ postId }: LikeButtonProps) {
   }
 
   return (
-    <Button variant="link" onClick={onClick}>
-      <Heart
-        fill={query.data ? '#ff0000' : 'none'}
-        color={query.data ? '#ff0000' : undefined}
-      />
-    </Button>
+    <Heart
+      size={30}
+      fill={query.data ? '#ff0000' : 'none'}
+      color={query.data ? '#ff0000' : undefined}
+      onClick={onClick}
+      className="cursor-pointer"
+    />
   );
 }

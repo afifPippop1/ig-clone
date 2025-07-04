@@ -18,18 +18,19 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  username  String     @unique
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
   password  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  Posts     Posts[]
-  Comments  Comments[]
-  Likes     Likes[]
-  Followers Follow[]   @relation("Following") // users who follow this user
-  Following Follow[]   @relation("Follower") // users this user follows
+  Posts        Posts[]
+  Comments     Comments[]
+  Likes        Likes[]
+  Followers    Follow[]       @relation("Following") // users who follow this user
+  Following    Follow[]       @relation("Follower") // users this user follows
+  CommentLikes CommentLikes[]
 }
 
 model Profile {
@@ -62,8 +63,9 @@ model Comments {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User  @relation(fields: [userId], references: [id])
-  post Posts @relation(fields: [postId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
+  post         Posts          @relation(fields: [postId], references: [id])
+  CommentLikes CommentLikes[]
 }
 
 model Likes {
@@ -87,4 +89,16 @@ model Follow {
 
   @@id([followerId, followingId]) // composite primary key
   @@map("follows") // optional: match table name in the DB
+}
+
+model CommentLikes {
+  id        String   @id @default(uuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  comment Comments @relation(fields: [commentId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+
+  @@unique([commentId, userId]) // user can only like a comment once
 }
