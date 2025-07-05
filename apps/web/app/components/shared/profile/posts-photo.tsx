@@ -20,7 +20,7 @@ export function PostsPhoto() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-4 gap-1">
+      <div className="grid grid-cols-3 gap-1">
         {SKELETON.map((v) => (
           <Skeleton key={v} className="aspect-square overflow-hidden" />
         ))}
@@ -31,7 +31,7 @@ export function PostsPhoto() {
     return <EmptyPosts />;
   }
   return (
-    <div className="grid grid-cols-4 gap-1">
+    <div className="grid grid-cols-3 gap-1">
       {data.map((post) => (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div

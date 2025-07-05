@@ -31,7 +31,7 @@ export default function ProfilePage() {
 
   if (state === 'loading') {
     return (
-      <div>
+      <div className="h-screen w-screen flex items-center justify-center">
         <Loader2Icon className="animate-spin" />
       </div>
     );

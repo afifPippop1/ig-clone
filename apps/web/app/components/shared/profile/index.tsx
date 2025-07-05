@@ -16,20 +16,18 @@ export function Profile(props: ProfileProps) {
     onOpenChange(true);
   }
   return (
-    <>
-      <div className="flex flex-col items-stretch">
-        <div className="flex gap-8">
-          <PhotoProfile className="cursor-pointer" onClick={onClick} />
-          <ProfileInfo {...props} />
-        </div>
-        <Posts />
+    <div className="flex flex-col items-stretch w-full">
+      <div className="flex gap-8">
+        <PhotoProfile className="cursor-pointer" onClick={onClick} />
+        <ProfileInfo {...props} />
       </div>
+      <Posts />
       <ChangePhotoProfileDialog
         isAuthorized={props.isCurrentUser}
         open={open}
         onOpenChange={onOpenChange}
       />
-    </>
+    </div>
   );
 }
 

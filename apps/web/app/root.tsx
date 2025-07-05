@@ -10,7 +10,7 @@ import {
 } from '@remix-run/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { AuthProvider } from './components/providers/auth-provider';
 import { Sidebar } from './components/shared/sidebar';
 import { TRPCProvider } from './lib/trpc';
@@ -100,16 +100,30 @@ export default function App() {
   return (
     <>
       <Toaster />
-      <div className="h-screen w-screen flex gap-8">
+      <div className="h-screen flex overflow-hidden">
         <QueryClientProvider client={queryClient}>
           <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
             <AuthProvider user={user}>
               <Sidebar />
-              <Outlet />
+              <AuthenticatedWrapper authenticated={!!user}>
+                <Outlet />
+              </AuthenticatedWrapper>
             </AuthProvider>
           </TRPCProvider>
         </QueryClientProvider>
       </div>
     </>
   );
+}
+
+function AuthenticatedWrapper({
+  authenticated,
+  children,
+}: {
+  authenticated: boolean;
+  children: ReactNode;
+}) {
+  if (!authenticated) return children;
+
+  return <div className="flex flex-1 px-36 py-8 overflow-auto">{children}</div>;
 }

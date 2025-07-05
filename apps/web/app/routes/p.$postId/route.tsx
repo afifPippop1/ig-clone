@@ -11,12 +11,12 @@ export default function PostPage() {
   const { data } = useQuery(trpc.post.getPost.queryOptions({ postId }));
 
   return (
-    <div className="flex gap-4">
-      <div>
+    <div className="flex gap-4 w-full">
+      <div className="w-5xl h-10/12 flex items-center justify-center">
         <img
           src={data?.contentUrl}
           alt={data?.caption || ''}
-          className="max-w-5xl max-h-10/12"
+          className="h-full w-full object-contain"
         />
       </div>
       <div className="flex-1">
