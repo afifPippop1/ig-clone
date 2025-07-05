@@ -1,6 +1,12 @@
 import { signInSchema, SignInSchema } from '@ig-clone/database';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { data, Form, useActionData, useNavigation } from '@remix-run/react';
+import {
+  data,
+  Form,
+  useActionData,
+  useNavigate,
+  useNavigation,
+} from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect } from 'react';
 import { Button } from '~/components/ui/button';
@@ -54,6 +60,8 @@ export default function SignInPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!isSubmitting && actionData?.error === null) {
       window.location.href = '/';
@@ -98,7 +106,7 @@ export default function SignInPage() {
                 className="p-2 border border-gray-300 rounded"
               />
             </div>
-            <Button type="submit">
+            <Button type="submit" className="cursor-pointer">
               {isSubmitting ? (
                 <>
                   <Loader2Icon className="animate-spin" />
@@ -109,6 +117,16 @@ export default function SignInPage() {
               )}
             </Button>
           </Form>
+          <p className="text-center">or</p>
+          <Button
+            onClick={() => {
+              navigate('/sign-up');
+            }}
+            variant="outline"
+            className="w-full cursor-pointer"
+          >
+            Sign Up
+          </Button>
         </CardContent>
       </Card>
     </div>

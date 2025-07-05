@@ -1,6 +1,12 @@
 import { signUpSchema, SignUpSchema } from '@ig-clone/database';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
+import {
+  Form,
+  redirect,
+  useActionData,
+  useNavigate,
+  useNavigation,
+} from '@remix-run/react';
 import { Loader2Icon } from 'lucide-react';
 import { Birthdate } from '~/components/shared/birthdate';
 import { Button } from '~/components/ui/button';
@@ -67,12 +73,14 @@ export default function SignUpPage() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="min-w-xl">
         <CardHeader>
           <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
-            Get started on Instagram
+            Get started on Clonegram
           </h1>
           <p>Sign up to see photos and videos from your friends.</p>
         </CardHeader>
@@ -126,7 +134,7 @@ export default function SignUpPage() {
                 </p>
               )}
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full cursor-pointer">
               {isSubmitting ? (
                 <>
                   <Loader2Icon className="animate-spin" />
@@ -137,6 +145,16 @@ export default function SignUpPage() {
               )}
             </Button>
           </Form>
+          <p className="text-center">or</p>
+          <Button
+            onClick={() => {
+              navigate('/sign-in');
+            }}
+            variant="outline"
+            className="w-full cursor-pointer"
+          >
+            Sign In
+          </Button>
         </CardContent>
       </Card>
     </div>

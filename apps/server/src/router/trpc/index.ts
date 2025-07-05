@@ -5,6 +5,7 @@ import { post } from './post';
 import { likes } from './like';
 import { comments } from './comments';
 import { commentLikes } from './comment-likes';
+import { follow } from './follow';
 
 export const trpcRouter = router({
   users: usersRouter,
@@ -13,6 +14,7 @@ export const trpcRouter = router({
   likes,
   comments,
   commentLikes,
+  follow,
 });
 
 export type AppRouter = typeof trpcRouter;

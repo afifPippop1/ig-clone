@@ -1,5 +1,6 @@
 import { DialogProps } from '@radix-ui/react-dialog';
-import { useMutation } from '@tanstack/react-query';
+import { useParams } from '@remix-run/react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, useRef } from 'react';
 import { toast } from 'sonner';
 import { useUpload } from '~/api/upload';
@@ -23,14 +24,19 @@ export function ChangePhotoProfileDialog(props: ChangePhotoProfileDialogProps) {
     props.onOpenChange?.(false);
   }
 
+  const { username } = useParams();
   const inputRef = useRef<HTMLInputElement>(null);
   const { refetch } = useUser();
   const { upload } = useUpload();
+  const queryClient = useQueryClient();
   const trpc = useTRPC();
   const mutation = useMutation(
     trpc.users.updateUser.mutationOptions({
       onSuccess: () => {
         refetch();
+        queryClient.invalidateQueries({
+          queryKey: trpc.users.getUser.queryKey({ username }),
+        });
       },
     }),
   );
