@@ -1,5 +1,12 @@
 import { useNavigate } from '@remix-run/react';
-import { Home, LucideProps, PlusSquare, Search, User } from 'lucide-react';
+import {
+  Home,
+  LogOut,
+  LucideProps,
+  PlusSquare,
+  Search,
+  User,
+} from 'lucide-react';
 import { ForwardRefExoticComponent, RefAttributes, useState } from 'react';
 import { ButtonProps } from 'react-day-picker';
 import { useUser } from '../providers/auth-provider';
@@ -14,18 +21,26 @@ export function Sidebar() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col items-stretch gap-4 min-w-56 relative border-r border-r-primary p-4">
-      <h2>Clonegram</h2>
-      <SidebarMenu icon={Home} onClick={() => navigate('/')}>
-        Home
-      </SidebarMenu>
-      <SidebarMenu icon={Search}>Search</SidebarMenu>
-      <SidebarMenu icon={User} onClick={() => navigate(`/${user?.username}`)}>
-        Profile
-      </SidebarMenu>
-      <SidebarMenu icon={PlusSquare} onClick={() => setOpen(true)}>
-        Create
-      </SidebarMenu>
+    <div className="min-w-56 relative border-r border-r-primary p-4 flex flex-col justify-between">
+      <div className="flex flex-col items-stretch gap-4">
+        <h2>Clonegram</h2>
+        <SidebarMenu icon={Home} onClick={() => navigate('/')}>
+          Home
+        </SidebarMenu>
+        <SidebarMenu icon={Search}>Search</SidebarMenu>
+        <SidebarMenu icon={User} onClick={() => navigate(`/${user?.username}`)}>
+          Profile
+        </SidebarMenu>
+        <SidebarMenu icon={PlusSquare} onClick={() => setOpen(true)}>
+          Create
+        </SidebarMenu>
+      </div>
+
+      <form method="post" action="/logout">
+        <SidebarMenu icon={LogOut} type="submit">
+          Log out
+        </SidebarMenu>
+      </form>
       <PostPhotoDialog open={open} onOpenChange={setOpen} />
     </div>
   );

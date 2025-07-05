@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { authCookie } from '~/lib/auth';
-import { trpc } from '~/lib/trpc';
+import { makeTRPC } from '~/lib/trpc';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const form = await request.formData();
@@ -22,6 +22,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   try {
+    const trpc = makeTRPC();
     const response = await trpc.auth.signIn.mutate({
       email: result.data.email,
       password: result.data.password,

@@ -15,7 +15,7 @@ export const authMiddleware = async ({ request }: LoaderFunctionArgs) => {
     } else if (token && AuthRoute.has(pathname)) {
       return redirect('/');
     } else {
-      const trpc = makeTRPC(token);
+      const trpc = makeTRPC({ token });
       const user = await trpc.auth.me.query();
       return { user, token };
     }

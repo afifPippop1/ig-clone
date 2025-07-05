@@ -10,7 +10,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const { username = '' } = params;
   const cookieString = request.headers.get('Cookie');
   const token: string = await authCookie.parse(cookieString);
-  const trpc = makeTRPC(token);
+  const trpc = makeTRPC({ token });
   const user = await trpc.users.getUser.query({ username });
   return { user };
 }

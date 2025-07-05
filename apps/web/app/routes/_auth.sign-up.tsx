@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { trpc } from '~/lib/trpc';
+import { makeTRPC } from '~/lib/trpc';
 
 const AlreadyExistsMessage = ' already exists';
 
@@ -24,6 +24,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     const { email, password, birthdate, name, username } = result.data;
+    const trpc = makeTRPC();
     const response = await trpc.auth.signUp.mutate({
       email,
       password,
