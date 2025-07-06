@@ -1,39 +1,30 @@
 import { prisma } from '@ig-clone/database';
 import { z } from 'zod';
-import { authenticatedProcedure, router } from '~/lib/trpc';
+import { authenticatedProcedure, publicProcedure, router } from '~/lib/trpc';
 import { TRPCServerError } from '~/utils/error';
 
 export const follow = router({
   isFollow: authenticatedProcedure
-    .input(z.object({ username: z.string() }))
+    .input(z.object({ userId: z.string() }))
     .query(async (opt) => {
-      const user = await prisma.user.findFirst({
-        where: { username: opt.input.username },
-      });
       const isFollow = await prisma.follow.findFirst({
         where: {
           followerId: opt.ctx.user.id,
-          followingId: user?.id,
+          followingId: opt.input.userId,
         },
       });
       return { isFollow };
     }),
   follow: authenticatedProcedure
-    .input(z.object({ username: z.string() }))
+    .input(z.object({ userId: z.string() }))
     .mutation(async (opt) => {
-      const user = await prisma.user.findFirst({
-        where: { username: opt.input.username },
+      await prisma.follow.create({
+        data: {
+          followerId: opt.ctx.user.id,
+          followingId: opt.input.userId,
+        },
       });
-      if (user) {
-        await prisma.follow.create({
-          data: {
-            followerId: opt.ctx.user.id,
-            followingId: user?.id,
-          },
-        });
-        return { ok: true, message: 'Follow success' };
-      }
-      throw TRPCServerError.badRequest('Follow failed');
+      return { ok: true, message: 'Follow success' };
     }),
 
   unfollow: authenticatedProcedure
@@ -45,5 +36,18 @@ export const follow = router({
           followerId_followingId: { followerId, followingId },
         },
       });
+    }),
+  follower: publicProcedure
+    .input(z.object({ followingId: z.string() }))
+    .query(async (opt) => {
+      const followingId = opt.input.followingId;
+      return await prisma.follow.count({ where: { followingId } });
+    }),
+
+  following: publicProcedure
+    .input(z.object({ followerId: z.string() }))
+    .query(async (opt) => {
+      const followerId = opt.input.followerId;
+      return await prisma.follow.count({ where: { followerId } });
     }),
 });

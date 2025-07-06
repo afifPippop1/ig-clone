@@ -1,5 +1,5 @@
 import { PublicUserSchema } from '@ig-clone/database';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -46,23 +46,30 @@ function ProfileInfo(props: ProfileProps) {
         <p className="text-2xl">{props.user.username}</p>
         <ProfileAction isCurrentUser={props.isCurrentUser} user={props.user} />
       </div>
-      <ProfileFollower />
+      <ProfileFollower user={props.user} />
       <p className="font-bold ">{props.user.name}</p>
     </div>
   );
 }
 
-function ProfileFollower() {
+function ProfileFollower(props: ProfileProps) {
+  const trpc = useTRPC();
+  const follower = useQuery(
+    trpc.follow.follower.queryOptions({ followingId: props.user.id }),
+  );
+  const following = useQuery(
+    trpc.follow.following.queryOptions({ followerId: props.user.id }),
+  );
   return (
     <div className="flex gap-4">
       <p>
         <strong>0</strong> posts
       </p>
       <p>
-        <strong>60</strong> followers
+        <strong>{follower.data}</strong> followers
       </p>
       <p>
-        <strong>343</strong> following
+        <strong>{following.data}</strong> following
       </p>
     </div>
   );
@@ -100,14 +107,25 @@ function ProfileAction({ isCurrentUser, user }: ProfileProps) {
 
 function NotCurrentUserAction(props: ProfileProps) {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const query = useQuery(
-    trpc.follow.isFollow.queryOptions({ username: props.user.username }),
+    trpc.follow.isFollow.queryOptions({ userId: props.user.id }),
   );
 
   const followMutation = useMutation(
     trpc.follow.follow.mutationOptions({
       onSuccess() {
         query.refetch();
+        queryClient.invalidateQueries({
+          queryKey: trpc.follow.follower.queryKey({
+            followingId: props.user.id,
+          }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.follow.following.queryKey({
+            followerId: props.user.id,
+          }),
+        });
       },
     }),
   );
@@ -116,6 +134,16 @@ function NotCurrentUserAction(props: ProfileProps) {
     trpc.follow.unfollow.mutationOptions({
       onSuccess() {
         query.refetch();
+        queryClient.invalidateQueries({
+          queryKey: trpc.follow.follower.queryKey({
+            followingId: props.user.id,
+          }),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.follow.following.queryKey({
+            followerId: props.user.id,
+          }),
+        });
       },
     }),
   );
@@ -124,7 +152,7 @@ function NotCurrentUserAction(props: ProfileProps) {
     if (query.data?.isFollow) {
       return await unfollowMutation.mutateAsync(query.data.isFollow);
     }
-    return await followMutation.mutateAsync({ username: props.user.username });
+    return await followMutation.mutateAsync({ userId: props.user.id });
   }
 
   if (query.isLoading) {
