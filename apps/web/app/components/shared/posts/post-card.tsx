@@ -1,7 +1,7 @@
 import { FeedOutput } from '@ig-clone/database';
+import { Link } from '@remix-run/react';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { FollowButton } from '../profile/follow-button';
-import { Link } from '@remix-run/react';
 import { LikeButton } from './like-button';
 
 export function PostCard({ feed }: { feed: FeedOutput }) {

@@ -1,40 +1,109 @@
-# Welcome to Remix!
+# 📸 IG Clone Monorepo
 
-- 📖 [Remix docs](https://remix.run/docs)
+A simple Instagram clone built with a monorepo structure, using Prisma, Express, PostgreSQL, and MinIO.
 
-## Development
+---
 
-Run the dev server:
+## prerequisite
 
-```sh
-npm run dev
+- node
+- docker
+- pnpm
+
+## 🧱 Tech Stack
+
+- **pnpm workspaces** — monorepo setup
+- **Prisma** — ORM for PostgreSQL
+- **PostgreSQL 17** — relational DB (via Docker)
+- **MinIO** — S3-compatible object storage (via Docker)
+- **Express** — server backend
+- **tRPC** — typesafe API layer
+- **Zod** — schema validation
+- **TSX** — for dev-friendly TypeScript runtime
+- **React (Remix)** — frontend app
+
+---
+
+## 📁 Monorepo Structure
+
+```
+├── apps/
+│   ├── server/ # Backend server
+│   └── web/ # Frontend client
+├── packages/
+│   └── database/ # Prisma schema & client
+├── docker-compose.yaml # DB & MinIO setup
+├── pnpm-workspace.yaml # Workspace config
+└── package.json # Root scripts
 ```
 
-## Deployment
+---
 
-First, build your app for production:
+## 🚀 Getting Started
 
-```sh
-npm run build
+### 1. Install dependencies
+
+```bash
+pnpm install
 ```
 
-Then run the app in production mode:
+### 2. Setup .env
 
-```sh
-npm start
+a. Server .env example
+
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?connection_limit=1&sslmode=disable"
+
+BUCKET_URL="http://localhost:9000"
+BUCKET_ACCESS_KEY_ID="minioadmin"
+BUCKET_SECRET_ACCESS_KEY="minioadmin"
+BUCKET_REGION="us-east-1"
 ```
 
-Now you'll need to pick a host to deploy it to.
+b. Web .env example
 
-### DIY
+```
+COOKIE_SECRET='cookie-secret'
+BACKEND_URL='http://localhost:4000'
+```
 
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+c. Database .env example
 
-Make sure to deploy the output of `npm run build`
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?connection_limit=1&sslmode=disable"
+```
 
-- `build/server`
-- `build/client`
+### 3. Run the app
 
-## Styling
+a. Run docker file
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+```
+docker compose up -d
+```
+
+b. Run app in dev mode
+
+```
+pnpm dev
+```
+
+### Common Script
+
+| Script                | Description                          |
+| --------------------- | ------------------------------------ |
+| `pnpm dev`            | Watch everything and run dev servers |
+| `pnpm build:server`   | Build the backend                    |
+| `pnpm build:database` | Build database client/types          |
+| `pnpm db:migrate`     | Run Prisma migrations                |
+| `pnpm db:generate`    | Generate Prisma client               |
+| `pnpm db:studio`      | Launch Prisma Studio                 |
+
+### 🧪 Tips
+
+Access MinIO UI at: http://localhost:9001
+
+Access Prisma Studio:
+
+```
+pnpm db:studio
+```
