@@ -1,7 +1,6 @@
 import { prisma } from '@ig-clone/database';
 import { z } from 'zod';
 import { authenticatedProcedure, publicProcedure, router } from '~/lib/trpc';
-import { TRPCServerError } from '~/utils/error';
 
 export const follow = router({
   isFollow: authenticatedProcedure

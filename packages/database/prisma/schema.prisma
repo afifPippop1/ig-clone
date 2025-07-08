@@ -31,6 +31,7 @@ model User {
   Followers    Follow[]       @relation("Following") // users who follow this user
   Following    Follow[]       @relation("Follower") // users this user follows
   CommentLikes CommentLikes[]
+  profile      Profile?       @relation("UserProfile")
 }
 
 model Profile {
@@ -40,6 +41,7 @@ model Profile {
   name             String
   birthdate        DateTime
   photoProfilePath String?
+  user             User     @relation("UserProfile", fields: [id], references: [id])
 }
 
 model Posts {

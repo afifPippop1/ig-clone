@@ -1,13 +1,13 @@
 import { PublicUserSchema } from '@ig-clone/database';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { Bookmark, Grid3X3 } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '~/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { useTRPC } from '~/lib/trpc';
 import { ChangePhotoProfileDialog } from './change-photo-profile';
+import { FollowButton } from './follow-button';
 import { PhotoProfile } from './photo-profile';
 import { PostsPhoto } from './posts-photo';
-import { Bookmark, Grid3X3 } from 'lucide-react';
 
 interface ProfileProps {
   user: PublicUserSchema;
@@ -106,69 +106,9 @@ function ProfileAction({ isCurrentUser, user }: ProfileProps) {
 }
 
 function NotCurrentUserAction(props: ProfileProps) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const query = useQuery(
-    trpc.follow.isFollow.queryOptions({ userId: props.user.id }),
-  );
-
-  const followMutation = useMutation(
-    trpc.follow.follow.mutationOptions({
-      onSuccess() {
-        query.refetch();
-        queryClient.invalidateQueries({
-          queryKey: trpc.follow.follower.queryKey({
-            followingId: props.user.id,
-          }),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.follow.following.queryKey({
-            followerId: props.user.id,
-          }),
-        });
-      },
-    }),
-  );
-
-  const unfollowMutation = useMutation(
-    trpc.follow.unfollow.mutationOptions({
-      onSuccess() {
-        query.refetch();
-        queryClient.invalidateQueries({
-          queryKey: trpc.follow.follower.queryKey({
-            followingId: props.user.id,
-          }),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.follow.following.queryKey({
-            followerId: props.user.id,
-          }),
-        });
-      },
-    }),
-  );
-
-  async function onClick() {
-    if (query.data?.isFollow) {
-      return await unfollowMutation.mutateAsync(query.data.isFollow);
-    }
-    return await followMutation.mutateAsync({ userId: props.user.id });
-  }
-
-  if (query.isLoading) {
-    return <></>;
-  }
-
   return (
     <div className="flex gap-4">
-      <Button
-        size="sm"
-        className="cursor-pointer"
-        onClick={onClick}
-        variant={query.data?.isFollow ? 'secondary' : undefined}
-      >
-        {query.data?.isFollow ? 'Following' : 'Follow'}
-      </Button>
+      <FollowButton user={props.user} showFollowingStatus />
     </div>
   );
 }
